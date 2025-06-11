@@ -793,52 +793,70 @@ function saveBlockchain() {
 }
 const wasteForm = document.getElementById('wasteForm');
 const formMessage = document.getElementById('formMessage');
+
 if (wasteForm) {
-  wasteForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    formMessage.textContent = '';
-    const producerName = wasteForm.producerName.value.trim();
-    const wasteType = wasteForm.wasteType.value;
-    const description = wasteForm.description.value.trim();
-    if (producerName.length < 3) {
-      formMessage.textContent = 'El nombre de la Pyme debe tener al menos 3 caracteres.';
-      formMessage.style.color = '#e74c3c';
-      return;
-    }
-    if (!wasteType) {
-      formMessage.textContent = 'Seleccione un tipo válido de residuo.';
-      formMessage.style.color = '#e74c3c';
-      return;
-    }
-    if (description.length < 10) {
-      formMessage.textContent = 'La descripción debe tener al menos 10 caracteres.';
-      formMessage.style.color = '#e74c3c';
-      return;
-    }
-    // En lugar de minar blockchain local, se envía a backend para guardar en MySQL
-    try {
-      formMessage.textContent = 'Enviando datos al servidor, por favor espere...';
-      formMessage.style.color = '#36D1DC';
-      const response = await fetch('http://localhost:3000/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ producerName, wasteType, description })
-      });
-      if (response.ok) {
-        formMessage.textContent = 'Residuo registrado correctamente.';
-        formMessage.style.color = '#00e676';
-        wasteForm.reset();
-        // Si quieres, puedes recargar blockchain o dashboard desde backend (no implementado)
-      } else {
-        const error = await response.json();
-        formMessage.textContent = `Error: ${error.error || 'Error desconocido'}`;
-        formMessage.style.color = '#e74c3c';
-      }
-    } catch (error) {
-      formMessage.textContent = `Error de conexión: ${error.message}`;
-      formMessage.style.color = '#e74c3c';
-    }
-  });
+    wasteForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        formMessage.textContent = '';
+        
+        const producerName = wasteForm.producerName.value.trim();
+        const wasteType = wasteForm.wasteType.value;
+        const description = wasteForm.description.value.trim();
+        
+        if (producerName.length < 3) {
+            formMessage.textContent = 'El nombre de la Pyme debe tener al menos 3 caracteres.';
+            formMessage.style.color = '#e74c3c';
+            return;
+        }
+        
+        if (!wasteType) {
+            formMessage.textContent = 'Seleccione un tipo válido de residuo.';
+            formMessage.style.color = '#e74c3c';
+            return;
+        }
+        
+        if (description.length < 10) {
+            formMessage.textContent = 'La descripción debe tener al menos 10 caracteres.';
+            formMessage.style.color = '#e74c3c';
+            return;
+        }
+
+        try {
+            formMessage.textContent = 'Registrando residuo en la blockchain...';
+            formMessage.style.color = '#36D1DC';
+            
+            // Cargar blockchain existente
+            await loadBlockchain();
+            
+            // Crear nuevo bloque
+            const prevHash = blockchain.length > 0 ? blockchain[blockchain.length-1].hash : '0';
+            const newBlock = createBlock({
+                producerName,
+                wasteType,
+                description,
+                status: "Registrado",
+                location: "Almacén inicial",
+                step: "Primer registro"
+            }, prevHash);
+            
+            // Minar el bloque (encontrar nonce que cumpla con la dificultad)
+            const minedBlock = await mineBlock(newBlock);
+            blockchain.push(minedBlock);
+            saveBlockchain();
+            
+            formMessage.textContent = '¡Residuo registrado correctamente en la blockchain!';
+            formMessage.style.color = '#00e676';
+            wasteForm.reset();
+            
+            // Actualizar la vista de trazabilidad
+            renderChain();
+            renderDashboard();
+            
+        } catch (error) {
+            formMessage.textContent = `Error al registrar: ${error.message}`;
+            formMessage.style.color = '#e74c3c';
+        }
+    });
 }
 const chainContainer = document.getElementById('chain');
 const clearChainBtn = document.getElementById('clearChainBtn');
