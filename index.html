@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Plataforma Blockchain para Trazabilidad de Residuos Electrónicos</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: #f0f0f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: #142744;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  }
+  header h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+  }
+  nav button {
+    background: transparent;
+    border: 2px solid #36D1DC;
+    color: #36D1DC;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 1rem;
+    transition: background 0.3s, color 0.3s;
+  }
+  nav button:hover, nav button.active {
+    background: #36D1DC;
+    color: #142744;
+  }
+  .user-info {
+    margin-left: 1.5rem;
+    color: #36D1DC;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+  }
+  .user-info .logout-btn {
+    margin-left: 1rem;
+    background: #e74c3c;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    padding: 0.35rem 1rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+  }
+  .user-info .logout-btn:hover { background: #c0392b; }
+  .user-info span {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+  }
+  .user-info .user-icon {
+    margin-right: 0.4em;
+    font-size: 1.1em;
+    color: #8ed6fb;
+  }
+  main {
+    flex-grow: 1;
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto 2rem;
+  }
+  section {
+    display: none;
+    animation: fadeIn 0.6s ease forwards;
+  }
+  section.active {
+    display: block;
+  }
+  h2 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    border-left: 6px solid #36D1DC;
+    padding-left: 0.75rem;
+  }
+  .welcome-container {
+    background: rgba(31, 65, 108, 0.6);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    margin-bottom: 2rem;
+  }
+  .welcome-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #36D1DC;
+    font-weight: 700;
+  }
+  .welcome-subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    color: #b3d4fc;
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .feature-card {
+    background: rgba(37, 56, 93, 0.7);
+    border-radius: 10px;
+    padding: 1.5rem;
+    border-top: 4px solid #36D1DC;
+  }
+  .feature-card h3 {
+    color: #36D1DC;
+    margin-top: 0;
+  }
+  .feature-card p {
+    color: #cfd8dc;
+    line-height: 1.5;
+  }
+  .icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #36D1DC;
+  }
+  form {
+    background: #1f416c;
+    padding: 1.25rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    max-width: 600px;
+  }
+  form label {
+    display: block;
+    margin-top: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  form input, form select, form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 6px;
+    border-radius: 6px;
+    border: none;
+    font-size: 1rem;
+    background: #385a9b;
+    color: #f0f0f0;
+    transition: background 0.3s;
+  }
+  form input:focus, form select:focus, form textarea:focus {
+    outline: none;
+    background: #2a4580;
+  }
+  form button {
+    margin-top: 20px;
+    background: #36D1DC;
+    color: #142744;
+    font-weight: 700;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.25s;
+  }
+  form button:hover {
+    background: #28a0b0;
+  }
+  .chain-container {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 1rem;
+    padding-bottom: 1rem;
+  }
+  .block {
+    min-width: 280px;
+    background: #25385d;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    flex-shrink: 0;
+    position: relative;
+  }
+  .block::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -30px;
+    width: 60px;
+    height: 4px;
+    background: #36D1DC;
+    transform: translateY(-50%);
+    border-radius: 2px;
+  }
+  .block:last-child::before {
+    display: none;
+  }
+  .block h3 {
+    margin: 0 0 8px 0;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #36D1DC;
+  }
+  .block small {
+    color: #a0b9d9;
+    display: block;
+    margin-bottom: 10px;
+  }
+  .block .hash {
+    word-break: break-word;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    background: #142744;
+    color: #36D1DC;
+    padding: 6px 10px;
+    border-radius: 8px;
+    user-select: all;
+  }
+  footer {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #a0b9d9;
+    font-size: 0.9rem;
+  }
+  @keyframes fadeIn {
+    from {opacity: 0; transform: translateY(12px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+  .status-indicator {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 8px;
+    background: #2c3e50;
+    color: white;
+  }
+  .status-Registrado { background: #3498db; }
+  .status-En-transporte { background: #f39c12; }
+  .status-En-proceso { background: #9b59b6; }
+  .status-En-desmontaje { background: #e67e22; }
+  .status-Componentes { background: #1abc9c; }
+  .status-Materiales { background: #27ae60; }
+  .status-Reciclaje { background: #2ecc71; }
+  .status-Disposición { background: #7f8c8d; }
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(31, 65, 108, 0.4);
+    border-radius: 10px;
+    margin-top: 1rem;
+  }
+  /* Dashboard Styles */
+  .dashboard-section {
+    background: #22355a;
+    border-radius: 12px;
+    padding: 2rem 2.5rem 2rem 2rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    margin-bottom: 2rem;
+    max-width: 600px;
+  }
+  .dashboard-title {
+    color: #36D1DC;
+    margin-top: 0;
+    font-size: 1.7rem;
+    margin-bottom: 1rem;
+  }
+  .dashboard-summary {
+    margin-top: 1.2rem;
+    margin-bottom: 1.6rem;
+  }
+  .dashboard-metric {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.7rem;
+    color: #b3d4fc;
+  }
+  .dashboard-bars {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .dashboard-bar-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5em;
+  }
+  .dashboard-bar-label {
+    width: 110px;
+    font-size: 1rem;
+    color: #8ed6fb;
+    text-align: right;
+    margin-right: 0.7em;
+  }
+  .dashboard-bar-track {
+    height: 22px;
+    background: #1e2c48;
+    border-radius: 5px;
+    flex: 1;
+    margin-right: 0.6em;
+    overflow: hidden;
+    position: relative;
+  }
+  .dashboard-bar-fill {
+    background: linear-gradient(90deg, #36D1DC 40%, #1fa7c7 100%);
+    height: 100%;
+    border-radius: 5px;
+    min-width: 2px;
+    transition: width 0.7s cubic-bezier(0.4,0.7,0.6,1.0);
+  }
+  .dashboard-bar-value {
+    width: 32px;
+    font-weight: bold;
+    color: #fff;
+    text-align: left;
+    font-size: 1rem;
+  }
+  @media (max-width: 800px) {
+    .dashboard-section { padding: 1.3rem 0.7rem; }
+    .dashboard-title { font-size: 1.3rem; }
+    .dashboard-bar-label { width: 75px; font-size: 0.93rem; }
+  }
+  /* LOGIN/REGISTER Styles */
+  .auth-modal-bg {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(20,39,68,0.75);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s;
+  }
+  .auth-modal {
+    background: #22355a;
+    padding: 2rem 2.2rem 1.2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    min-width: 320px;
+    max-width: 95vw;
+    color: #f0f0f0;
+    position: relative;
+    animation: fadeIn 0.5s;
+  }
+  .auth-modal h2 {
+    color: #36D1DC; margin-top: 0; font-size: 1.5rem;
+  }
+  .auth-modal label { font-weight: 600; margin: 16px 0 6px 0; display: block; }
+  .auth-modal input[type="text"], .auth-modal input[type="password"], .auth-modal input[type="email"] {
+    width: 100%; padding: 8px 10px; border-radius: 6px; border: none;
+    background: #385a9b; color: #f0f0f0; font-size: 1rem; margin-bottom: 8px;
+  }
+  .auth-modal input:focus { outline: none; background: #2a4580; }
+  .auth-modal button {
+    background: #36D1DC; color: #142744; font-weight: 700; border: none;
+    padding: 0.65rem 1.5rem; border-radius: 8px; cursor: pointer;
+    margin-top: 14px; margin-bottom: 10px; width: 100%; font-size: 1rem;
+    transition: background 0.25s;
+  }
+  .auth-modal button:hover { background: #28a0b0; }
+  .auth-modal .switch-link {
+    display: block; text-align: center; color: #b3d4fc; font-size: 0.98rem;
+    margin-top: 6px; cursor: pointer; text-decoration: underline;
+  }
+  .auth-modal .close-auth {
+    position: absolute; top: 12px; right: 16px; color: #b3d4fc;
+    font-size: 1.2rem; background: none; border: none; cursor: pointer;
+  }
+  .auth-modal .auth-error {
+    color: #e74c3c; text-align: center; margin-top: 6px; font-size: 0.97rem;
+  }
+  .auth-modal .auth-success {
+    color: #2ecc71; text-align: center; margin-top: 6px; font-size: 0.97rem;
+  }
+  @media (max-width: 640px) {
+    header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    nav {
+      margin-top: 0.8rem;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+    }
+    .chain-container {
+      flex-wrap: nowrap;
+      overflow-x: scroll;
+      padding-bottom: 1rem;
+    }
+    .welcome-title {
+      font-size: 1.5rem;
+    }
+    .welcome-subtitle {
+      font-size: 1rem;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Blockchain Trazabilidad - Residuos Electrónicos</h1>
+  <nav>
+    <button id="nav-home" class="active" aria-label="Inicio">Inicio</button>
+    <button id="nav-dashboard" aria-label="Dashboard">Dashboard</button>
+    <button id="nav-register" aria-label="Registrar Residuo">Registrar Residuo</button>
+    <button id="nav-trace" aria-label="Ver Trazabilidad">Ver Trazabilidad</button>
+    <button id="nav-login" aria-label="Iniciar sesión/Registro">Iniciar sesión</button>
+  </nav>
+  <div id="userInfo" class="user-info" style="display:none;"></div>
+</header>
+<main>
+  <section id="section-home" class="active" aria-label="Sección de inicio">
+    <div class="welcome-container">
+      <h1 class="welcome-title">¡Bienvenido a la Plataforma de Trazabilidad!</h1>
+      <p class="welcome-subtitle">Sistema blockchain para gestionar el ciclo completo de residuos electrónicos en PYMES</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="icon">🔗</div>
+          <h3>Trazabilidad Completa</h3>
+          <p>Seguimiento en tiempo real de cada etapa del proceso de reciclaje electrónico</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">⛓️</div>
+          <h3>Blockchain Seguro</h3>
+          <p>Registros inmutables y transparentes con tecnología blockchain</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">📋</div>
+          <h3>Registro Manual</h3>
+          <p>Los estados solo avanzan cuando se registran cambios manualmente</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon">📱</div>
+          <h3>Fácil de Usar</h3>
+          <p>Interfaz intuitiva diseñada para PYMES de Lima Metropolitana</p>
+        </div>
+      </div>
+    </div>
+    <div style="background: rgba(31, 65, 108, 0.6); padding: 1.5rem; border-radius: 10px;">
+      <h2>¿Cómo comenzar?</h2>
+      <ol style="line-height: 1.6; padding-left: 1.2rem;">
+        <li><strong>Registra</strong> un nuevo residuo electrónico</li>
+        <li><strong>Visualiza</strong> su trazabilidad en la cadena de bloques</li>
+        <li><strong>Actualiza manualmente</strong> los estados cuando sea necesario</li>
+      </ol>
+      <p style="margin-top: 1rem; font-style: italic; color: #b3d4fc;">
+        "Contribuyendo a un reciclaje electrónico más transparente y sostenible"
+      </p>
+    </div>
+  </section>
+
+  <section id="section-dashboard" class="dashboard-section" style="display:none;" aria-label="Dashboard">
+    <h2 class="dashboard-title">Dashboard de Residuos Electrónicos</h2>
+    <div class="dashboard-summary" id="dashboardSummary">
+      <div class="dashboard-metric" id="dashboardTotal">Total residuos: 0</div>
+    </div>
+    <div class="dashboard-bars" id="dashboardBars"></div>
+    <div id="dashboardEmpty" style="margin-top:2em; color:#b3d4fc; display:none;">
+      No hay residuos registrados aún. Registre residuos para ver el dashboard.
+    </div>
+  </section>
+
+  <section id="section-register" aria-label="Sección para registrar residuo">
+    <h2>Registrar Residuo Electrónico</h2>
+    <div id="registerNotice" style="display:none; background: #c0392b; color: #fff; padding: 1rem 1.2rem; border-radius: 10px; margin-bottom: 1.2rem; font-weight:600; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+      Debe <span style="text-decoration:underline; cursor:pointer;" id="registerLoginLink">iniciar sesión</span> o <span style="text-decoration:underline; cursor:pointer;" id="registerRegLink">crear una cuenta</span> para registrar un residuo electrónico.
+    </div>
+    <form id="wasteForm" aria-describedby="formDesc" novalidate>
+      <p id="formDesc">Ingrese los datos para registrar un nuevo residuo electrónico y su descripción.</p>
+      <label for="producerName">Nombre de la Pyme o Productor</label>
+      <input type="text" id="producerName" name="producerName" placeholder="Ej: Empresa XYZ" required minlength="3" />
+      <label for="wasteType">Tipo de Residuo Electrónico</label>
+      <select id="wasteType" name="wasteType" required>
+        <option value="" disabled selected>Seleccione un tipo</option>
+        <option value="Computadora">Computadora</option>
+        <option value="Celular">Celular</option>
+        <option value="Televisor">Televisor</option>
+        <option value="Impresora">Impresora</option>
+        <option value="Batería">Batería</option>
+        <option value="Otro">Otro</option>
+      </select>
+      <label for="description">Descripción / Estado</label>
+      <textarea id="description" name="description" rows="3" placeholder="Descripción del residuo, estado, detalles adicionales..." required minlength="10"></textarea>
+      <button type="submit">Registrar Residuo</button>
+    </form>
+    <p id="formMessage" role="alert" style="margin-top: 1rem;"></p>
+  </section>
+  <section id="section-trace" aria-label="Sección ver trazabilidad del residuo">
+    <h2>Trazabilidad Blockchain</h2>
+    <div id="traceNotice" style="display:none; background: #c0392b; color: #fff; padding: 1rem 1.2rem; border-radius: 10px; margin-bottom: 1.2rem; font-weight:600; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+      Debe <span style="text-decoration:underline; cursor:pointer;" id="traceLoginLink">iniciar sesión</span> o <span style="text-decoration:underline; cursor:pointer;" id="traceRegLink">crear una cuenta</span> para ver la trazabilidad de los residuos electrónicos.
+    </div>
+    <div id="traceContent">
+      <p>Visualice la cadena de bloques que registra cada etapa del residuo electrónico.</p>
+      <div id="chain" class="chain-container" aria-live="polite" aria-relevant="additions">
+        <div id="empty-chain" class="empty-state">
+          <p>No hay residuos registrados aún.</p>
+          <p>Registre un residuo electrónico para comenzar a ver la trazabilidad.</p>
+        </div>
+      </div>
+      <button id="clearChainBtn" style="margin-top: 1rem; background:#e74c3c; color:#fff;">Limpiar Cadena</button>
+    </div>
+  </section>
+</main>
+<footer>
+  &copy; 2025 Plataforma Blockchain - Lima Metropolitana PYMES
+</footer>
+<!-- LOGIN / REGISTER MODAL -->
+<div id="authModalBg" class="auth-modal-bg" style="display:none;">
+  <div class="auth-modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <button class="close-auth" id="closeAuth" aria-label="Cerrar">&times;</button>
+    <h2 id="authTitle">Iniciar sesión</h2>
+    <form id="loginForm" autocomplete="off" style="display:block;">
+      <label for="loginUser">Usuario o Email</label>
+      <input id="loginUser" type="text" name="loginUser" required minlength="3" autocomplete="username" />
+      <label for="loginPass">Contraseña</label>
+      <input id="loginPass" type="password" name="loginPass" required minlength="4" autocomplete="current-password" />
+      <button type="submit">Entrar</button>
+      <span class="auth-error" id="loginError"></span>
+      <span class="auth-success" id="loginSuccess"></span>
+      <span class="switch-link" id="toRegister">¿No tienes cuenta? Regístrate</span>
+    </form>
+    <form id="registerForm" autocomplete="off" style="display:none;">
+      <label for="regUser">Usuario</label>
+      <input id="regUser" type="text" name="regUser" required minlength="3" />
+      <label for="regEmail">Email</label>
+      <input id="regEmail" type="email" name="regEmail" required />
+      <label for="regPass">Contraseña</label>
+      <input id="regPass" type="password" name="regPass" required minlength="4" />
+      <label for="regPass2">Confirmar Contraseña</label>
+      <input id="regPass2" type="password" name="regPass2" required minlength="4" />
+      <button type="submit">Registrar</button>
+      <span class="auth-error" id="registerError"></span>
+      <span class="auth-success" id="registerSuccess"></span>
+      <span class="switch-link" id="toLogin">¿Ya tienes cuenta? Inicia sesión</span>
+    </form>
+  </div>
+</div>
+<script>
+// --- AUTH & USER MANAGEMENT ---
+function getUsers() { return JSON.parse(localStorage.getItem("eWasteUsers") || "[]"); }
+function saveUsers(users) { localStorage.setItem("eWasteUsers", JSON.stringify(users)); }
+function getCurrentUser() { return JSON.parse(localStorage.getItem("eWasteCurrentUser") || "null"); }
+function setCurrentUser(userObj) {
+  if (userObj) localStorage.setItem("eWasteCurrentUser", JSON.stringify(userObj));
+  else localStorage.removeItem("eWasteCurrentUser");
+}
+async function hashPassword(pass) {
+  const enc = new TextEncoder();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', enc.encode(pass));
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+const authModalBg = document.getElementById('authModalBg');
+const loginForm = document.getElementById('loginForm');
+const registerForm = document.getElementById('registerForm');
+const loginError = document.getElementById('loginError');
+const loginSuccess = document.getElementById('loginSuccess');
+const registerError = document.getElementById('registerError');
+const registerSuccess = document.getElementById('registerSuccess');
+const navLoginBtn = document.getElementById('nav-login');
+const closeAuthBtn = document.getElementById('closeAuth');
+const toRegister = document.getElementById('toRegister');
+const toLogin = document.getElementById('toLogin');
+const userInfo = document.getElementById('userInfo');
+function showAuthModal(mode = "login") {
+  authModalBg.style.display = "flex";
+  document.body.style.overflow = "hidden";
+  loginForm.style.display = mode === "login" ? "block" : "none";
+  registerForm.style.display = mode === "register" ? "block" : "none";
+  document.getElementById("authTitle").textContent = mode === "login" ? "Iniciar sesión" : "Registro";
+  loginError.textContent = loginSuccess.textContent = "";
+  registerError.textContent = registerSuccess.textContent = "";
+  setTimeout(() => {
+    if (mode === "login") document.getElementById("loginUser").focus();
+    else document.getElementById("regUser").focus();
+  }, 170);
+}
+function hideAuthModal() {
+  authModalBg.style.display = "none";
+  document.body.style.overflow = "";
+}
+navLoginBtn.addEventListener("click", () => showAuthModal("login"));
+closeAuthBtn.addEventListener("click", hideAuthModal);
+toRegister.addEventListener("click", () => showAuthModal("register"));
+toLogin.addEventListener("click", () => showAuthModal("login"));
+registerForm.addEventListener("submit", async function(e) {
+  e.preventDefault();
+  registerError.textContent = "";
+  registerSuccess.textContent = "";
+  const user = registerForm.regUser.value.trim();
+  const email = registerForm.regEmail.value.trim().toLowerCase();
+  const pass = registerForm.regPass.value;
+  const pass2 = registerForm.regPass2.value;
+  if (user.length < 3) { registerError.textContent = "Usuario debe tener al menos 3 caracteres."; return; }
+  if (!/\S+@\S+\.\S+/.test(email)) { registerError.textContent = "Email inválido."; return; }
+  if (pass.length < 4) { registerError.textContent = "Contraseña muy corta."; return; }
+  if (pass !== pass2) { registerError.textContent = "Las contraseñas no coinciden."; return; }
+  let users = getUsers();
+  if (users.some(u => u.user === user || u.email === email)) {
+    registerError.textContent = "El usuario o email ya está registrado.";
+    return;
+  }
+  const hashed = await hashPassword(pass);
+  const newUser = { user, email, pass: hashed };
+  users.push(newUser);
+  saveUsers(users);
+  setCurrentUser({ user, email });
+  registerSuccess.textContent = "¡Registro exitoso! Redireccionando...";
+  setTimeout(() => { hideAuthModal(); updateUserUI(); }, 1200);
+});
+loginForm.addEventListener("submit", async function(e) {
+  e.preventDefault();
+  loginError.textContent = "";
+  loginSuccess.textContent = "";
+  const userOrEmail = loginForm.loginUser.value.trim();
+  const pass = loginForm.loginPass.value;
+  if (userOrEmail.length < 3 || pass.length < 4) {
+    loginError.textContent = "Datos inválidos.";
+    return;
+  }
+  let users = getUsers();
+  const hashed = await hashPassword(pass);
+  const found = users.find(u =>
+    (u.user === userOrEmail || u.email === userOrEmail) && u.pass === hashed
+  );
+  if (!found) {
+    loginError.textContent = "Usuario/contraseña incorrectos.";
+    return;
+  }
+  setCurrentUser({ user: found.user, email: found.email });
+  loginSuccess.textContent = "¡Bienvenido!";
+  setTimeout(() => { hideAuthModal(); updateUserUI(); }, 900);
+});
+function updateUserUI() {
+  const u = getCurrentUser();
+  if (u) {
+    userInfo.style.display = "flex";
+    userInfo.innerHTML = `<span><span class="user-icon">👤</span>${u.user}</span>
+      <button class="logout-btn" id="logoutBtn" title="Cerrar sesión">Salir</button>`;
+    navLoginBtn.style.display = "none";
+    document.getElementById("section-register").style.display = "";
+    if (document.getElementById("registerNotice")) document.getElementById("registerNotice").style.display = "none";
+    if (document.getElementById("wasteForm")) document.getElementById("wasteForm").style.display = "";
+    if (document.getElementById("traceNotice")) document.getElementById("traceNotice").style.display = "none";
+    if (document.getElementById("traceContent")) document.getElementById("traceContent").style.display = "";
+    setTimeout(() => {
+      document.getElementById("logoutBtn").onclick = function() {
+        setCurrentUser(null);
+        updateUserUI();
+      };
+    }, 50);
+  } else {
+    userInfo.style.display = "none";
+    navLoginBtn.style.display = "";
+    if (document.getElementById("section-register")) {
+      document.getElementById("section-register").style.display = "";
+      if (document.getElementById("registerNotice")) document.getElementById("registerNotice").style.display = "";
+      if (document.getElementById("wasteForm")) document.getElementById("wasteForm").style.display = "none";
+      setTimeout(()=>{
+        const loginLink = document.getElementById("registerLoginLink");
+        const regLink = document.getElementById("registerRegLink");
+        if(loginLink) loginLink.onclick=()=>showAuthModal("login");
+        if(regLink) regLink.onclick=()=>showAuthModal("register");
+      },30);
+    }
+    if (document.getElementById("section-trace")) {
+      document.getElementById("section-trace").style.display = "";
+      if (document.getElementById("traceNotice")) document.getElementById("traceNotice").style.display = "";
+      if (document.getElementById("traceContent")) document.getElementById("traceContent").style.display = "none";
+      setTimeout(()=>{
+        const loginLink = document.getElementById("traceLoginLink");
+        const regLink = document.getElementById("traceRegLink");
+        if(loginLink) loginLink.onclick=()=>showAuthModal("login");
+        if(regLink) regLink.onclick=()=>showAuthModal("register");
+      },30);
+    }
+    const activeBtn = document.querySelector('nav button.active')?.id;
+    if (activeBtn === "nav-register" || activeBtn === "nav-trace") {
+      document.getElementById("nav-home").click();
+    }
+  }
+}
+document.getElementById("nav-dashboard").addEventListener("click", function() {
+  showSection("section-dashboard");
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  this.classList.add('active');
+});
+document.getElementById("nav-home").addEventListener("click", function() {
+  showSection("section-home");
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  this.classList.add('active');
+});
+document.getElementById("nav-register").addEventListener("click", function() {
+  showSection("section-register");
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  this.classList.add('active');
+});
+document.getElementById("nav-trace").addEventListener("click", function() {
+  showSection("section-trace");
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  this.classList.add('active');
+});
+function showSection(sectionId) {
+  document.querySelectorAll('main > section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('main > section').forEach(s => s.style.display = "none");
+  const s = document.getElementById(sectionId);
+  if (s) {
+    s.classList.add('active');
+    s.style.display = "";
+    if (sectionId === "section-dashboard") renderDashboard();
+  }
+}
+window.addEventListener('DOMContentLoaded', function(){
+  updateUserUI();
+  renderDashboard();
+  loadBlockchain().then(renderChain);
+});
+// ----- BLOCKCHAIN & Form -----
+const statusFlow = [
+  "Registrado",
+  "En transporte a centro de acopio",
+  "En proceso de clasificación",
+  "En desmontaje/desensamblaje",
+  "Componentes separados",
+  "Materiales procesados",
+  "Reciclaje completado",
+  "Disposición final"
+];
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+let blockchain = [];
+function createBlock(data, prevHash) {
+  return {
+    timestamp: new Date().toISOString(),
+    data,
+    previousHash: prevHash,
+    hash: '',
+    nonce: 0
+  };
+}
+async function mineBlock(block, difficulty=3) {
+  return new Promise(async (resolve) => {
+    let prefix = '0'.repeat(difficulty);
+    while (true) {
+      const blockString = JSON.stringify({...block, nonce: block.nonce});
+      const hash = await sha256(blockString);
+      if (hash.startsWith(prefix)) {
+        block.hash = hash;
+        resolve(block);
+        break;
+      } else {
+        block.nonce++;
+      }
+    }
+  });
+}
+async function loadBlockchain() {
+  const stored = localStorage.getItem('eWasteBlockchain');
+  if (stored) {
+    try {
+      blockchain = JSON.parse(stored);
+      if (blockchain.length === 1 && blockchain[0].data.info) {
+        blockchain = [];
+      }
+    } catch (e) {
+      blockchain = [];
+    }
+  }
+}
+function saveBlockchain() {
+  localStorage.setItem('eWasteBlockchain', JSON.stringify(blockchain));
+}
+const wasteForm = document.getElementById('wasteForm');
+const formMessage = document.getElementById('formMessage');
+if (wasteForm) {
+  wasteForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    formMessage.textContent = '';
+    const producerName = wasteForm.producerName.value.trim();
+    const wasteType = wasteForm.wasteType.value;
+    const description = wasteForm.description.value.trim();
+    if (producerName.length < 3) {
+      formMessage.textContent = 'El nombre de la Pyme debe tener al menos 3 caracteres.';
+      formMessage.style.color = '#e74c3c';
+      return;
+    }
+    if (!wasteType) {
+      formMessage.textContent = 'Seleccione un tipo válido de residuo.';
+      formMessage.style.color = '#e74c3c';
+      return;
+    }
+    if (description.length < 10) {
+      formMessage.textContent = 'La descripción debe tener al menos 10 caracteres.';
+      formMessage.style.color = '#e74c3c';
+      return;
+    }
+    // En lugar de minar blockchain local, se envía a backend para guardar en MySQL
+    try {
+      formMessage.textContent = 'Enviando datos al servidor, por favor espere...';
+      formMessage.style.color = '#36D1DC';
+      const response = await fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ producerName, wasteType, description })
+      });
+      if (response.ok) {
+        formMessage.textContent = 'Residuo registrado correctamente.';
+        formMessage.style.color = '#00e676';
+        wasteForm.reset();
+        // Si quieres, puedes recargar blockchain o dashboard desde backend (no implementado)
+      } else {
+        const error = await response.json();
+        formMessage.textContent = `Error: ${error.error || 'Error desconocido'}`;
+        formMessage.style.color = '#e74c3c';
+      }
+    } catch (error) {
+      formMessage.textContent = `Error de conexión: ${error.message}`;
+      formMessage.style.color = '#e74c3c';
+    }
+  });
+}
+const chainContainer = document.getElementById('chain');
+const clearChainBtn = document.getElementById('clearChainBtn');
+function renderChain() {
+  chainContainer.innerHTML = '';
+  if (blockchain.length === 0) {
+    chainContainer.innerHTML = `
+      <div id="empty-chain" class="empty-state">
+        <p>No hay residuos registrados aún.</p>
+        <p>Registre un residuo electrónico para comenzar a ver la trazabilidad.</p>
+      </div>
+    `;
+    return;
+  }
+  blockchain.forEach((block, index) => {
+    const status = block.data.status || '';
+    const statusClass = status ? 'status-' + status.replace(/ /g, '-').split('/')[0] : '';
+    const blockEl = document.createElement('div');
+    blockEl.classList.add('block');
+    blockEl.setAttribute('tabindex', '0');
+    blockEl.innerHTML = `
+      <h3>Bloque #${index}</h3>
+      <small>Fecha: ${new Date(block.timestamp).toLocaleString('es-PE')}</small>
+      <div><strong>Cadena Anterior:</strong></div>
+      <div class="hash">${block.previousHash}</div>
+      <div><strong>Hash:</strong></div>
+      <div class="hash">${block.hash}</div>
+      <div><strong>Datos:</strong></div>
+      <div style="color:#b3d4fc; font-size: 0.9rem; margin-top: 6px;">
+        <p><strong>Pyme:</strong> ${block.data.producerName || block.data.info || '-'}</p>
+        <p><strong>Tipo Residuos:</strong> ${block.data.wasteType || '-'}</p>
+        <p><strong>Descripción:</strong> ${block.data.description || '-'}</p>
+        <p><strong>Estado:</strong> 
+          <span class="status-indicator ${statusClass}">${status || '-'}</span>
+        </p>
+        <p><strong>Ubicación:</strong> ${block.data.location || '-'}</p>
+        <p><strong>Etapa:</strong> ${block.data.step || '-'}</p>
+        <p><strong>Nonce:</strong> ${block.nonce}</p>
+      </div>
+    `;
+    chainContainer.appendChild(blockEl);
+  });
+}
+if (clearChainBtn) {
+  clearChainBtn.addEventListener('click', async () => {
+    if (confirm('¿Está seguro que quiere limpiar toda la cadena? Esto eliminará todos los registros.')) {
+      blockchain = [];
+      saveBlockchain();
+      renderChain();
+      renderDashboard();
+    }
+  });
+}
+// ----------- Dashboard Logic -----------
+function getWasteStats() {
+  let chain = [];
+  try { chain = JSON.parse(localStorage.getItem('eWasteBlockchain') || '[]'); } catch {}
+  const wasteTypes = [
+    "Computadora", "Celular", "Televisor", "Impresora", "Batería", "Otro"
+  ];
+  const stats = {};
+  let total = 0;
+  for (const t of wasteTypes) stats[t] = 0;
+  for (const block of chain) {
+    if (block.data && block.data.wasteType && stats.hasOwnProperty(block.data.wasteType)) {
+      stats[block.data.wasteType]++;
+      total++;
+    }
+  }
+  return { stats, total };
+}
+function renderDashboard() {
+  const { stats, total } = getWasteStats();
+  const dashboardTotal = document.getElementById("dashboardTotal");
+  const dashboardSummary = document.getElementById("dashboardSummary");
+  const dashboardBars = document.getElementById("dashboardBars");
+  const dashboardEmpty = document.getElementById("dashboardEmpty");
+  dashboardTotal.textContent = `Total residuos: ${total}`;
+  let resumen = "";
+  Object.entries(stats).forEach(([tipo, cantidad]) => {
+    resumen += `<div class="dashboard-metric">${tipo}: <span style="color:#fff">${cantidad}</span></div>`;
+  });
+  dashboardSummary.innerHTML = dashboardTotal.outerHTML + resumen;
+  let max = Math.max(1, ...Object.values(stats));
+  let bars = "";
+  Object.entries(stats).forEach(([tipo, cantidad]) => {
+    let percent = (cantidad / max) * 100;
+    bars += `
+      <div class="dashboard-bar-row">
+        <div class="dashboard-bar-label">${tipo}</div>
+        <div class="dashboard-bar-track"><div class="dashboard-bar-fill" style="width:${percent}%;"></div></div>
+        <div class="dashboard-bar-value">${cantidad}</div>
+      </div>
+    `;
+  });
+  dashboardBars.innerHTML = bars;
+  dashboardEmpty.style.display = total === 0 ? "" : "none";
+}
+</script>
+</body>
+</html>
